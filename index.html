@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Number Guessing Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: white;
+      color: white;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .box {
+      background-color: #2c3e66;
+      width: 500px;
+      padding: 50px;
+      border-radius: 10px;
+    }
+    h1 {
+      color: #ffc857;
+    }
+    input, select, button {
+      padding: 10px;
+      font-size: 20px;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+    }
+    button {
+      background-color: #ffc857;
+      color: #1e2a47;
+      cursor: pointer;
+    }
+    #message {
+      font-size: 20px;
+      margin-top: 15px;
+    }
+    #history {
+      color: #aab7d1;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Guess the Number</h1>
+
+    <select id="level" onchange="startGame()">
+      <option value="easy">Easy (1-50)</option>
+      <option value="medium" selected>Medium (1-100)</option>
+      <option value="hard">Hard (1-500)</option>
+    </select>
+
+    <p id="info"></p>
+
+    <input type="number" id="guess" placeholder="Enter guess">
+    <button onclick="checkGuess()">Guess</button>
+
+    <p id="message"></p>
+    <p>Attempts: <span id="attempts">0</span></p>
+    <p id="history"></p>
+
+    <button id="restart" onclick="startGame()" style="display:none">Play Again</button>
+  </div>
+
+  <script>
+    var secret = 0;
+    var attempts = 0;
+    var maxNumber = 100;
+    var maxAttempts = 7;
+    var gameOver = false;
+    var allGuesses = [];
+
+    // shows a message with a color
+    function showMessage(text, color) {
+      var msg = document.getElementById("message");
+      msg.innerHTML = text;
+      msg.style.color = color;
+    }
+
+    // starts a new game
+    function startGame() {
+      var level = document.getElementById("level").value;
+
+      if (level == "easy") {
+        maxNumber = 50;
+        maxAttempts = 10;
+      } else if (level == "medium") {
+        maxNumber = 100;
+        maxAttempts = 7;
+      } else {
+        maxNumber = 500;
+        maxAttempts = 9;
+      }
+
+      secret = Math.floor(Math.random() * maxNumber) + 1;
+      attempts = 0;
+      gameOver = false;
+      allGuesses = [];
+
+      document.getElementById("info").innerHTML =
+        "Guess a number between 1 and " + maxNumber + ". You have " + maxAttempts + " attempts.";
+      showMessage("", "white");
+      document.getElementById("attempts").innerHTML = 0;
+      document.getElementById("history").innerHTML = "";
+      document.getElementById("guess").value = "";
+      document.getElementById("restart").style.display = "none";
+    }
+
+    // checks the number the user typed
+    function checkGuess() {
+      if (gameOver == true) {
+        return;
+      }
+
+      var guess = parseInt(document.getElementById("guess").value);
+
+      // check if input is valid
+      if (isNaN(guess) || guess < 1 || guess > maxNumber) {
+        showMessage("Please enter a number between 1 and " + maxNumber, "#ffc857");
+        return;
+      }
+
+      attempts++;
+      allGuesses.push(guess);
+      document.getElementById("attempts").innerHTML = attempts;
+
+      // show all guesses using a loop
+      var text = "Your guesses: ";
+      for (var i = 0; i < allGuesses.length; i++) {
+        text = text + allGuesses[i] + " ";
+      }
+      document.getElementById("history").innerHTML = text;
+
+      if (guess == secret) {
+        showMessage("Correct! You guessed it in " + attempts + " attempts.", "#6fdc8c");
+        endGame();
+      } else if (attempts == maxAttempts) {
+        showMessage("Game over! The number was " + secret, "#ff6b6b");
+        endGame();
+      } else if (guess > secret) {
+        showMessage("Too high!", "#ff6b6b");
+      } else {
+        showMessage("Too low!", "#5bc0eb");
+      }
+
+      document.getElementById("guess").value = "";
+    }
+
+    function endGame() {
+      gameOver = true;
+      document.getElementById("restart").style.display = "inline";
+    }
+
+    startGame();
+  </script>
+</body>
+</html>
